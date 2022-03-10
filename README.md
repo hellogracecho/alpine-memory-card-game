@@ -1,5 +1,7 @@
 # Memory Card Game built with Alpine.js
 
+## [Click to Play! 🐸](https://hellogracecho.github.io/alpine-memory-card-game/)
+
 ### JS Core Concepts
 - `getter` 
 - `await` & `Promise`
