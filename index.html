@@ -10,6 +10,9 @@
 </head>
 <body>
     <div x-data="handleCard()" class="p-10 flex items-center justify-center min-h-screen">
+        <div class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center" x-show="!initGame"  @click="startGame(cards)">
+            <span class="px-6 py-4 border border-8 border-green-500 rounded-3xl text-4xl text-green-500 font-bold">Click to Play! 🐸</span>
+        </div>
         <div class="flex-1 grid grid-cols-4 gap-10">
             <h2 class="col-span-full text-right">Matched: <span x-text="points"></span></h2>
             <template x-for="card in cards">
@@ -49,18 +52,49 @@
         }));
     }
 
+    // shuffle cards
+    function shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+      
+        // While there remain elements to shuffle...
+        while (currentIndex != 0) {
+      
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+      
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+      
+        return array;
+    }
+
+
     function handleCard() {
         return {
             cards: [
-                { color: '#79378A', flipped: false, cleared: false },
+                { color: '#8b4b9c', flipped: false, cleared: false },
                 { color: '#EA2462', flipped: false, cleared: false },
                 { color: '#7ECE13', flipped: false, cleared: false },
                 { color: '#FFE500', flipped: false, cleared: false },
-                { color: '#79378A', flipped: false, cleared: false },
+                { color: '#13bdce', flipped: false, cleared: false },
+                { color: '#e66c', flipped: false, cleared: false },
+                { color: '#8b4b9c', flipped: false, cleared: false },
                 { color: '#EA2462', flipped: false, cleared: false },
                 { color: '#7ECE13', flipped: false, cleared: false },
                 { color: '#FFE500', flipped: false, cleared: false },
+                { color: '#13bdce', flipped: false, cleared: false },
+                { color: '#e66c', flipped: false, cleared: false },
             ],
+
+            initGame: false,
+
+            startGame() {
+                shuffle(this.cards);
+                this.initGame = true;
+            },
 
             get flippedCards() {
                 return this.cards.filter(card => card.flipped && !card.cleared);
@@ -76,7 +110,7 @@
                     return;
                 }
 
-                card.flipped = !card.flipped
+                card.flipped = !card.flipped;
 
                 if (this.flippedCards.length === 2) {
                     // has match
