@@ -24,11 +24,12 @@
             </template>
         </div>
         <div 
-        class="flex items-center fixed bottom-10 right-10 bg-blue-700 p-4 rounded-lg text-white font-bold"
+        class="flex items-center fixed bottom-10 right-10 bg-green-700 p-4 rounded-lg text-white font-bold"
+        :class="{ 'bg-red-500':warning }"
         x-show="show"
         x-transition
-        x-data="{ show: false, message: 'flash card here' }"
-        x-on:flash.window="show = true, message = $event.detail.message, setTimeout(() => show = false, 1200)"
+        x-data="{ show: false, warning: false, message: 'flash card here' }"
+        x-on:flash.window="show = true, message = $event.detail.message, warning = $event.detail.warning, setTimeout(() => show = false, 1200)"
         >
           <span x-text="message"></span>
           <span class="ml-2 text-2xl cursor-pointer" @click="show = false">&times;</span>
@@ -42,9 +43,9 @@
     }
 
     // custom event for Flash Card
-    function eventFlash(message) {
+    function eventFlash(message, warning = false) {
         window.dispatchEvent(new CustomEvent('flash',{
-            detail: { message: message }
+            detail: { message: message, warning: warning }
         }));
     }
 
@@ -87,6 +88,8 @@
                         if ( !this.cards.filter(card => !card.cleared).length ) {
                             window.alert('you won');
                         }
+                    } else {
+                        eventFlash(`oops, didn't match!`, true);
                     }
                     
                     await pause();
