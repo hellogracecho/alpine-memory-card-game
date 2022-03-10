@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤓 Memory Card Game with AlpineJS</title>
+    <script defer src="https://unpkg.com/alpinejs@3.9.1/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div x-data="handleCard()" class="p-10 flex items-center justify-center min-h-screen">
+        <div class="flex-1 grid grid-cols-4 gap-10">
+            <h2 class="col-span-full text-right">Matched: <span x-text="points"></span></h2>
+            <template x-for="card in cards">
+                <div class="h-40" :style="(card.cleared ? 'border: 1px solid #ddd' : '' )">
+                    <button 
+                    class="w-full h-full" 
+                    @click="flipCard(card)" 
+                    x-show="!card.cleared"
+                    :style="'background-color: ' + (card.flipped ? card.color : '#ddd' )"
+                    ></button>
+                </div>
+            </template>
+        </div>
+        <div 
+        class="flex items-center fixed bottom-10 right-10 bg-blue-700 p-4 rounded-lg text-white font-bold"
+        x-show="show"
+        x-transition
+        x-data="{ show: false, message: 'flash card here' }"
+        x-on:flash.window="show = true, message = $event.detail.message, setTimeout(() => show = false, 1200)"
+        >
+          <span x-text="message"></span>
+          <span class="ml-2 text-2xl cursor-pointer" @click="show = false">&times;</span>
+        </div>
+    </div>
+</body>
+<script>
+    // await this promise to be fulfilled
+    function pause(time = 1000) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+
+    // custom event for Flash Card
+    function eventFlash(message) {
+        window.dispatchEvent(new CustomEvent('flash',{
+            detail: { message: message }
+        }));
+    }
+
+    function handleCard() {
+        return {
+            cards: [
+                { color: '#79378A', flipped: false, cleared: false },
+                { color: '#EA2462', flipped: false, cleared: false },
+                { color: '#7ECE13', flipped: false, cleared: false },
+                { color: '#FFE500', flipped: false, cleared: false },
+                { color: '#79378A', flipped: false, cleared: false },
+                { color: '#EA2462', flipped: false, cleared: false },
+                { color: '#7ECE13', flipped: false, cleared: false },
+                { color: '#FFE500', flipped: false, cleared: false },
+            ],
+
+            get flippedCards() {
+                return this.cards.filter(card => card.flipped && !card.cleared);
+            },
+
+            get points() {
+                return this.cards.filter(card => card.cleared).length;
+            },
+
+            async flipCard(card){
+                // already two are flipped
+                if ( this.flippedCards.length === 2 ) {
+                    return;
+                }
+
+                card.flipped = !card.flipped
+
+                if (this.flippedCards.length === 2) {
+                    // has match
+                    if (this.flippedCards[0].color == this.flippedCards[1].color) {
+                        eventFlash('You found a match!');
+                        await pause();
+                        this.flippedCards.forEach(card => card.cleared = true);
+                        // no remaining card == fin!
+                        if ( !this.cards.filter(card => !card.cleared).length ) {
+                            window.alert('you won');
+                        }
+                    }
+                    
+                    await pause();
+                    this.flippedCards.forEach(card => card.flipped = false)
+                }
+            }
+        }
+    }
+</script>
+</html>
